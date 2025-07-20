@@ -1,0 +1,24 @@
+
+{
+  "name": "ecommerce-api",
+  "version": "1.0.0",
+  "description": "Professional E-commerce Backend API",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["ecommerce", "api", "backend", "nodejs", "express", "mongodb"],
+  "author": "E-commerce Team",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^22.13.11",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.3"
+  }
+}

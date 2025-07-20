@@ -1,0 +1,223 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow">
+  <div class="container">
+    <!-- Brand -->
+    <a class="navbar-brand fw-bold fs-3" routerLink="/home">
+      <i class="bi bi-shop me-2"></i>ShopEasy
+    </a>
+
+    <!-- Mobile toggle button -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="!isMenuCollapsed"
+      aria-controls="navbarNav"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible navbar content -->
+    <div
+      class="collapse navbar-collapse"
+      [ngClass]="{ show: !isMenuCollapsed }"
+      id="navbarNav"
+    >
+      <!-- Center navigation links -->
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item">
+          <a
+            class="nav-link fw-semibold"
+            routerLink="/home"
+            routerLinkActive="active"
+          >
+            <i class="bi bi-house me-1"></i> Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link fw-semibold"
+            routerLink="/products"
+            routerLinkActive="active"
+          >
+            <i class="bi bi-grid me-1"></i> Products
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link fw-semibold"
+            routerLink="/about"
+            routerLinkActive="active"
+          >
+            <i class="bi bi-info-circle me-1"></i> About
+          </a>
+        </li>
+      </ul>
+
+      <!-- Right side navigation -->
+      <ul class="navbar-nav">
+        <!-- When user is NOT logged in -->
+        <ng-container *ngIf="!isLoggedIn">
+          <li class="nav-item">
+            <a class="nav-link fw-semibold" routerLink="/login">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Login
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-semibold" routerLink="/signup">
+              <i class="bi bi-person-plus me-1"></i> Signup
+            </a>
+          </li>
+        </ng-container>
+
+        <!-- When user is logged in -->
+        <ng-container *ngIf="isLoggedIn">
+          <!-- Regular user navigation -->
+          <ng-container *ngIf="isUser">
+            <li class="nav-item">
+              <a class="nav-link fw-semibold" routerLink="/cart">
+                <i class="bi bi-cart me-1"></i> Cart
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-semibold" routerLink="/my-orders">
+                <i class="bi bi-bag-check me-1"></i> My Orders
+              </a>
+            </li>
+          </ng-container>
+
+          <!-- Admin navigation -->
+          <ng-container *ngIf="isAdmin">
+            <li class="nav-item">
+              <a class="nav-link fw-semibold" routerLink="/add-product">
+                <i class="bi bi-plus-circle me-1"></i> Add Product
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-semibold" routerLink="/orders">
+                <i class="bi bi-list-check me-1"></i> Orders
+              </a>
+            </li>
+          </ng-container>
+
+          <!-- User dropdown menu -->
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle fw-semibold d-flex align-items-center px-3"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              style="text-decoration: none"
+            >
+              <!-- User avatar with proper spacing -->
+              <div
+                class="user-avatar me-2 d-flex align-items-center justify-content-center"
+              >
+                {{ userInitials }}
+              </div>
+
+              <!-- User name and role -->
+              <div class="user-info">
+                <div class="user-name text-white">{{ userName }}</div>
+                <small class="user-role text-white-50">{{
+                  currentUser?.role | titlecase
+                }}</small>
+              </div>
+            </a>
+
+            <!-- Dropdown menu with better styling -->
+            <ul
+              class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2"
+              aria-labelledby="navbarDropdown"
+              style="min-width: 250px"
+            >
+              <!-- User profile header -->
+              <li class="dropdown-header bg-light rounded-top p-3 mb-0">
+                <div class="d-flex align-items-center">
+                  <div
+                    class="user-avatar-large me-3 d-flex align-items-center justify-content-center"
+                  >
+                    {{ userInitials }}
+                  </div>
+                  <div class="flex-grow-1">
+                    <h6 class="mb-1 fw-bold text-primary">{{ userName }}</h6>
+                    <small class="text-muted d-block">{{ userEmail }}</small>
+                    <span class="badge bg-primary rounded-pill mt-1 small">
+                      {{ currentUser?.role | titlecase }}
+                    </span>
+                  </div>
+                </div>
+              </li>
+
+              <li><hr class="dropdown-divider m-0" /></li>
+
+              <!-- Mobile navigation items (only visible on small screens) -->
+              <div class="d-lg-none">
+                <li *ngIf="isUser">
+                  <a
+                    class="dropdown-item py-2"
+                    routerLink="/cart"
+                    (click)="collapseMenu()"
+                  >
+                    <i class="bi bi-cart me-2 text-primary"></i> Cart
+                  </a>
+                </li>
+                <li *ngIf="isUser">
+                  <a
+                    class="dropdown-item py-2"
+                    routerLink="/my-orders"
+                    (click)="collapseMenu()"
+                  >
+                    <i class="bi bi-bag-check me-2 text-primary"></i> My Orders
+                  </a>
+                </li>
+                <li *ngIf="isAdmin">
+                  <a
+                    class="dropdown-item py-2"
+                    routerLink="/add-product"
+                    (click)="collapseMenu()"
+                  >
+                    <i class="bi bi-plus-circle me-2 text-warning"></i> Add
+                    Product
+                  </a>
+                </li>
+                <li *ngIf="isAdmin">
+                  <a
+                    class="dropdown-item py-2"
+                    routerLink="/orders"
+                    (click)="collapseMenu()"
+                  >
+                    <i class="bi bi-list-check me-2 text-warning"></i> Orders
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+              </div>
+
+              <!-- Logout button -->
+              <li class="p-2">
+                <button
+                  class="dropdown-item text-danger fw-bold py-2 rounded"
+                  (click)="logout()"
+                >
+                  <i class="bi bi-box-arrow-right me-2"></i> Logout
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Direct logout button for desktop -->
+          <li class="nav-item d-none d-lg-block ms-2">
+            <button
+              class="btn btn-outline-light btn-sm fw-semibold px-3"
+              (click)="logout()"
+            >
+              <i class="bi bi-box-arrow-right me-1"></i> Logout
+            </button>
+          </li>
+        </ng-container>
+      </ul>
+    </div>
+  </div>
+</nav>

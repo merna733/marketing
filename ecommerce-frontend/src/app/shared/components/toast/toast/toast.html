@@ -1,0 +1,25 @@
+<!-- toast.html -->
+<div
+  class="position-fixed top-0 end-0 p-3"
+  style="z-index: 1055; top: 80px !important"
+>
+  <div
+    *ngFor="let toast of toasts"
+    class="toast show mb-2"
+    [ngClass]="getToastClass(toast.type)"
+    style="min-width: 300px"
+  >
+    <div class="toast-header">
+      <i [ngClass]="getIconClass(toast.type)" class="me-2"></i>
+      <strong class="me-auto">{{ getToastTitle(toast.type) }}</strong>
+      <button
+        type="button"
+        class="btn-close"
+        (click)="removeToast(toast.id)"
+      ></button>
+    </div>
+    <div class="toast-body">
+      {{ toast.message }}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,155 @@
+<div class="container py-5 mt-5">
+  <div class="row">
+    <div class="col-12">
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold text-primary">
+          <i class="bi bi-list-check me-2"></i> All Orders
+        </h1>
+        <button
+          class="btn btn-outline-primary"
+          (click)="retryLoading()"
+          [disabled]="isLoading"
+        >
+          <i class="bi bi-arrow-clockwise me-1"></i>
+          {{ isLoading ? "Loading..." : "Refresh" }}
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-5">
+        <div
+          class="spinner-border text-primary mb-3"
+          role="status"
+          style="width: 3rem; height: 3rem"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <h4 class="text-muted">Loading orders...</h4>
+        <p class="text-muted">Please wait while we fetch the latest orders.</p>
+        <div class="progress mt-3" style="height: 6px">
+          <div
+            class="progress-bar progress-bar-striped progress-bar-animated"
+            style="width: 100%"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error && !isLoading" class="text-center py-5">
+        <div class="alert alert-danger d-inline-block">
+          <i class="bi bi-exclamation-triangle fs-1 text-danger mb-3"></i>
+          <h3 class="text-danger">Error Loading Orders</h3>
+          <p class="mb-3">{{ error }}</p>
+          <button class="btn btn-primary me-2" (click)="retryLoading()">
+            <i class="bi bi-arrow-clockwise me-1"></i> Try Again
+          </button>
+          <button
+            class="btn btn-outline-secondary"
+            onclick="window.location.reload()"
+          >
+            <i class="bi bi-arrow-clockwise me-1"></i> Refresh Page
+          </button>
+        </div>
+      </div>
+
+      <!-- Success: Orders Table -->
+      <div *ngIf="!isLoading && !error && orders.length > 0">
+        <div class="card shadow border-0">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="bi bi-table me-2"></i> Orders Management ({{
+                orders.length
+              }}
+              total)
+            </h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="px-4 py-3">Order ID</th>
+                    <th class="px-4 py-3">Customer</th>
+                    <th class="px-4 py-3">Date</th>
+                    <th class="px-4 py-3">Items</th>
+                    <th class="px-4 py-3">Total</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let order of orders; let i = index">
+                    <td class="px-4 py-3">
+                      <strong class="text-primary"
+                        >#{{ order._id?.slice(-8) || "N/A" }}</strong
+                      >
+                    </td>
+                    <td class="px-4 py-3">
+                      <div>
+                        <div class="fw-semibold">
+                          {{ getUserName(order.user) }}
+                        </div>
+                        <small class="text-muted">{{
+                          getUserEmail(order.user)
+                        }}</small>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span>{{ formatDate(order.createdAt) }}</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="badge bg-info"
+                        >{{ order.products?.length || 0 }} items</span
+                      >
+                    </td>
+                    <td class="px-4 py-3">
+                      <strong class="text-success"
+                        >${{ order.totalPrice?.toFixed(2) || "0.00" }}</strong
+                      >
+                    </td>
+                    <td class="px-4 py-3">
+                      <span [class]="getStatusBadgeClass(order.status)">
+                        {{ order.status | titlecase }}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <select
+                        class="form-select form-select-sm"
+                        [value]="order.status"
+                        (change)="
+                          updateOrderStatus(
+                            order._id,
+                            $any($event.target).value
+                          )
+                        "
+                        style="min-width: 120px"
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Orders State -->
+      <div
+        *ngIf="!isLoading && !error && orders.length === 0"
+        class="text-center py-5"
+      >
+        <i class="bi bi-clipboard-x display-1 text-muted"></i>
+        <h3 class="text-muted mt-3">No Orders Found</h3>
+        <p class="text-muted">No orders have been placed yet.</p>
+        <button class="btn btn-primary" (click)="retryLoading()">
+          <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

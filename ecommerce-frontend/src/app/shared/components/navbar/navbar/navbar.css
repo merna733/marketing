@@ -1,0 +1,88 @@
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-avatar-large {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-name {
+  font-size: 14px;
+  line-height: 1.2;
+  color: white;
+  font-weight: 600;
+}
+
+.user-role {
+  font-size: 11px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Dropdown styling */
+.dropdown-menu {
+  min-width: 280px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+}
+
+.dropdown-item {
+  padding: 10px 20px;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  transform: translateX(5px);
+}
+
+.dropdown-item.text-danger:hover {
+  background: linear-gradient(135deg, #f8d7da, #f1aeb5);
+  color: #842029 !important;
+}
+
+/* Navbar brand hover effect */
+.navbar-brand:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* Nav link hover effects */
+.nav-link {
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  transform: translateY(-2px);
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Button hover effects */
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}

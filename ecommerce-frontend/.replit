@@ -1,0 +1,20 @@
+modules = ["nodejs-22", "web"]
+run = "npm run watch"
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "npm run watch"]
+
+[workflows]
+runButton = "Angular Dev Server"
+
+[[workflows.workflow]]
+name = "Angular Dev Server"
+author = 45275387
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "ng serve --host 0.0.0.0 --port 5000"

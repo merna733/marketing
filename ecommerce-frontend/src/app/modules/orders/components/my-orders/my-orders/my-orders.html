@@ -1,0 +1,318 @@
+<div class="container py-5 mt-5">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="fw-bold text-primary mb-0">
+          <i class="bi bi-bag-check me-2"></i> My Orders
+        </h1>
+        <button
+          class="btn btn-outline-primary"
+          (click)="loadOrders()"
+          [disabled]="isLoading"
+        >
+          <i class="bi bi-arrow-clockwise me-1"></i>
+          {{ isLoading ? "Loading..." : "Refresh" }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div
+      class="spinner-border text-primary mb-3"
+      role="status"
+      style="width: 3rem; height: 3rem"
+    >
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <h4 class="text-muted">Loading your orders...</h4>
+  </div>
+
+  <!-- Orders List -->
+  <div *ngIf="!isLoading && orders.length > 0">
+    <div
+      *ngFor="let order of orders; let i = index"
+      class="card mb-4 shadow-sm border-0 rounded-3"
+    >
+      <!-- Order Header -->
+      <div class="card-header bg-light border-0 py-3">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h5 class="fw-bold mb-1">
+              <i class="bi bi-receipt me-2 text-primary"></i>
+              Order #{{ order._id?.slice(-8) || "Unknown" }}
+            </h5>
+            <small class="text-muted">
+              <i class="bi bi-calendar me-1"></i>
+              Placed on {{ formatDate(order.createdAt) }}
+            </small>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <div class="d-flex align-items-center justify-content-md-end gap-2">
+              <!-- Order Status -->
+              <span
+                [class]="getStatusBadgeClass(order.status)"
+                class="px-3 py-2 rounded-pill fw-semibold"
+              >
+                <i [class]="getStatusIcon(order.status)" class="me-1"></i>
+                {{ order.status | titlecase }}
+              </span>
+
+              <!-- Cancel Button (only for pending orders) -->
+              <button
+                *ngIf="canCancelOrder(order)"
+                class="btn btn-outline-danger btn-sm"
+                (click)="showCancelConfirmation(order)"
+                [disabled]="cancellingOrderId === order._id"
+                title="Cancel Order"
+              >
+                <span
+                  *ngIf="cancellingOrderId === order._id"
+                  class="spinner-border spinner-border-sm me-1"
+                ></span>
+                <i
+                  class="bi bi-x-circle me-1"
+                  *ngIf="cancellingOrderId !== order._id"
+                ></i>
+                {{
+                  cancellingOrderId === order._id ? "Cancelling..." : "Cancel"
+                }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Progress Bar -->
+        <div class="mt-3" *ngIf="order.status !== 'cancelled'">
+          <div class="progress" style="height: 6px">
+            <div
+              class="progress-bar"
+              [class.bg-success]="order.status === 'delivered'"
+              [class.bg-info]="order.status === 'shipped'"
+              [class.bg-warning]="order.status === 'pending'"
+              [style.width.%]="getOrderProgress(order.status)"
+            ></div>
+          </div>
+          <div class="d-flex justify-content-between mt-1">
+            <small class="text-muted">Order Placed</small>
+            <small class="text-muted">Shipped</small>
+            <small class="text-muted">Delivered</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body p-4">
+        <div class="row">
+          <!-- Order Items -->
+          <div class="col-lg-8">
+            <h6 class="fw-bold text-primary mb-3">
+              <i class="bi bi-box me-2"></i>
+              Order Items ({{ getTotalItems(order) }})
+            </h6>
+
+            <div
+              *ngFor="let item of order.products; let last = last"
+              class="mb-3"
+            >
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  <img
+                    *ngIf="item.product?.image"
+                    [src]="item.product.image"
+                    [alt]="item.product.name"
+                    class="rounded shadow-sm"
+                    style="width: 60px; height: 60px; object-fit: cover"
+                  />
+                  <div
+                    *ngIf="!item.product?.image"
+                    class="bg-light rounded d-flex align-items-center justify-content-center shadow-sm"
+                    style="width: 60px; height: 60px"
+                  >
+                    <i class="bi bi-image text-muted"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="fw-bold mb-1">
+                    {{ item.product?.name || "Unknown Product" }}
+                  </h6>
+                  <p class="text-muted small mb-1">
+                    {{ item.product?.description || "No description" }}
+                  </p>
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="text-primary fw-semibold"
+                      >${{ formatPrice(item.product?.price || 0) }}</span
+                    >
+                    <span class="text-muted">Qty: {{ item.quantity }}</span>
+                    <span class="fw-bold text-success">
+                      Total: ${{
+                        formatPrice((item.product?.price || 0) * item.quantity)
+                      }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <hr *ngIf="!last" class="my-3" />
+            </div>
+          </div>
+
+          <!-- Order Summary -->
+          <div class="col-lg-4">
+            <div class="card bg-light border-0 h-100">
+              <div class="card-body">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="bi bi-calculator me-2"></i>
+                  Order Summary
+                </h6>
+
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Items ({{ getTotalItems(order) }})</span>
+                  <span>${{ formatPrice(order.totalPrice) }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Shipping</span>
+                  <span class="text-success fw-bold">FREE</span>
+                </div>
+
+                <hr />
+
+                <div class="d-flex justify-content-between mb-3">
+                  <h6 class="fw-bold">Total Paid</h6>
+                  <h6 class="fw-bold text-primary">
+                    ${{ formatPrice(order.totalPrice) }}
+                  </h6>
+                </div>
+
+                <!-- Order Actions -->
+                <div class="d-grid gap-2" *ngIf="order.status === 'delivered'">
+                  <button class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-repeat me-1"></i> Reorder
+                  </button>
+                  <button class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-download me-1"></i> Invoice
+                  </button>
+                </div>
+
+                <!-- Delivery Info -->
+                <div class="mt-3" *ngIf="order.status === 'shipped'">
+                  <div class="alert alert-info small mb-0">
+                    <i class="bi bi-truck me-1"></i>
+                    <strong>On the way!</strong> Your order has been shipped and
+                    should arrive soon.
+                  </div>
+                </div>
+
+                <!-- Cancelled Info -->
+                <div class="mt-3" *ngIf="order.status === 'cancelled'">
+                  <div class="alert alert-danger small mb-0">
+                    <i class="bi bi-x-circle me-1"></i>
+                    <strong>Cancelled</strong> This order has been cancelled.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Orders State -->
+  <div *ngIf="!isLoading && orders.length === 0" class="text-center py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <i class="bi bi-bag-x display-1 text-muted mb-4"></i>
+        <h3 class="text-muted mb-3">No orders found</h3>
+        <p class="text-muted mb-4">
+          You haven't placed any orders yet. Start shopping to see your orders
+          here!
+        </p>
+        <a
+          routerLink="/products"
+          class="btn btn-primary btn-lg"
+          (click)="goToProducts()"
+        >
+          <i class="bi bi-grid me-2"></i> Start Shopping
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Order Confirmation Modal -->
+<div
+  *ngIf="showCancelModal"
+  class="modal d-block"
+  style="background: rgba(0, 0, 0, 0.5)"
+  (click)="closeCancelModal()"
+>
+  <div
+    class="modal-dialog modal-dialog-centered"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 bg-danger text-white">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-exclamation-triangle me-2"></i> Cancel Order
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          (click)="closeCancelModal()"
+        ></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="text-center mb-3">
+          <i class="bi bi-x-circle display-4 text-danger mb-3"></i>
+          <h6 class="fw-bold">Are you sure you want to cancel this order?</h6>
+        </div>
+
+        <div class="card bg-light border-0 mb-3" *ngIf="orderToCancel">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-6">
+                <small class="text-muted">Order Number:</small>
+                <div class="fw-bold">#{{ orderToCancel._id?.slice(-8) }}</div>
+              </div>
+              <div class="col-6 text-end">
+                <small class="text-muted">Total Amount:</small>
+                <div class="fw-bold text-primary">
+                  ${{ formatPrice(orderToCancel.totalPrice) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-warning border-0">
+          <i class="bi bi-info-circle me-2"></i>
+          <strong>Important:</strong> Once cancelled, this action cannot be
+          undone. You'll need to place a new order if you change your mind.
+        </div>
+      </div>
+      <div class="modal-footer border-0 bg-light">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="closeCancelModal()"
+        >
+          <i class="bi bi-arrow-left me-1"></i> Keep Order
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger fw-bold"
+          (click)="cancelOrder()"
+          [disabled]="cancellingOrderId"
+        >
+          <span
+            *ngIf="cancellingOrderId"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          <i class="bi bi-x-circle me-1" *ngIf="!cancellingOrderId"></i>
+          {{ cancellingOrderId ? "Cancelling..." : "Cancel Order" }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

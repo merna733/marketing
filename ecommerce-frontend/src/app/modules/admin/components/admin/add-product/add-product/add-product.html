@@ -1,0 +1,167 @@
+<div class="container py-5 mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-5">
+          <div class="text-center mb-4">
+            <h2 class="fw-bold text-primary">
+              <i class="bi bi-plus-circle me-2"></i>
+              {{ isEditMode ? "Update Product" : "Add New Product" }}
+            </h2>
+            <p class="text-muted">
+              {{
+                isEditMode
+                  ? "Update product information"
+                  : "Fill in the details to add a new product"
+              }}
+            </p>
+          </div>
+
+          <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="name" class="form-label fw-semibold">
+                  <i class="bi bi-tag me-1"></i> Product Name *
+                </label>
+                <input
+                  type="text"
+                  class="form-control form-control-lg"
+                  id="name"
+                  formControlName="name"
+                  placeholder="Enter product name"
+                  [class.is-invalid]="
+                    productForm.get('name')?.invalid &&
+                    productForm.get('name')?.touched
+                  "
+                />
+                <div class="invalid-feedback">
+                  <small *ngIf="productForm.get('name')?.hasError('required')"
+                    >Product name is required</small
+                  >
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="category" class="form-label fw-semibold">
+                  <i class="bi bi-grid me-1"></i> Category
+                </label>
+                <input
+                  type="text"
+                  class="form-control form-control-lg"
+                  id="category"
+                  formControlName="category"
+                  placeholder="Enter product category"
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label for="price" class="form-label fw-semibold">
+                  <i class="bi bi-currency-dollar me-1"></i> Price *
+                </label>
+                <input
+                  type="number"
+                  class="form-control form-control-lg"
+                  id="price"
+                  formControlName="price"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  [class.is-invalid]="
+                    productForm.get('price')?.invalid &&
+                    productForm.get('price')?.touched
+                  "
+                />
+                <div class="invalid-feedback">
+                  <small *ngIf="productForm.get('price')?.hasError('required')"
+                    >Price is required</small
+                  >
+                  <small *ngIf="productForm.get('price')?.hasError('min')"
+                    >Price must be greater than 0</small
+                  >
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="stock" class="form-label fw-semibold">
+                  <i class="bi bi-box me-1"></i> Stock Quantity *
+                </label>
+                <input
+                  type="number"
+                  class="form-control form-control-lg"
+                  id="stock"
+                  formControlName="stock"
+                  placeholder="0"
+                  min="0"
+                  [class.is-invalid]="
+                    productForm.get('stock')?.invalid &&
+                    productForm.get('stock')?.touched
+                  "
+                />
+                <div class="invalid-feedback">
+                  <small *ngIf="productForm.get('stock')?.hasError('required')"
+                    >Stock quantity is required</small
+                  >
+                  <small *ngIf="productForm.get('stock')?.hasError('min')"
+                    >Stock must be 0 or greater</small
+                  >
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label for="image" class="form-label fw-semibold">
+                  <i class="bi bi-image me-1"></i> Image URL
+                </label>
+                <input
+                  type="url"
+                  class="form-control form-control-lg"
+                  id="image"
+                  formControlName="image"
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+
+              <div class="col-12">
+                <label for="description" class="form-label fw-semibold">
+                  <i class="bi bi-card-text me-1"></i> Description
+                </label>
+                <textarea
+                  class="form-control"
+                  id="description"
+                  formControlName="description"
+                  rows="4"
+                  placeholder="Enter product description"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="row mt-4">
+              <div class="col-12">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-lg me-md-2"
+                    routerLink="/products"
+                  >
+                    <i class="bi bi-arrow-left me-1"></i> Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-lg"
+                    [disabled]="productForm.invalid || isLoading"
+                  >
+                    <span
+                      *ngIf="isLoading"
+                      class="spinner-border spinner-border-sm me-2"
+                    ></span>
+                    <i class="bi bi-check-circle me-1"></i>
+                    {{ isEditMode ? "Update Product" : "Add Product" }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
