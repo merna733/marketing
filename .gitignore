@@ -1,0 +1,14 @@
+
+# Node modules
+**/node_modules/
+
+
+
+# Ignore Angular build output
+frontend/dist/
+frontend/out-tsc/
+
+# Ignore environment files
+frontend/src/environments/environment*.ts
+backend/.env
+
